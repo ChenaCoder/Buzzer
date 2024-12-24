@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  
+	</script>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="icon" type="image/png" href="images/favicon.ico">
+     <title>Join A Buzzer Room</title>
+	<style type="text/css">
+		body {
+			background: #81cef5;
+		}
+		div {
+			text-align: center;
+			margin: auto;
+               width: 55vh; 
+			margin-top: 1vh;
+			font-size: 4vh;
+              
+		}
+		h1 {
+			text-align: center;
+			margin: auto;
+               font-size: 8vh;
+               font-family: 'Noto Sans', sans-serif;
+               color: #002e83;
+		}
+          #cont{
+               text-align: center;
+               background-color: rgb(255, 255, 255);
+               border-radius: 2vh;
+               border: 0px;
+               font: inherit;
+               background: rgba(255, 255, 255, 0.87);
+               border-radius: 25px;
+               box-shadow: 5px 20px 25px rgba(175, 175, 175, 0.699);
+               padding: 3vh;
+               overflow: auto;
+               text-align: center;
+               margin-top: 12vh;
+               font-family: 'Noto Sans', sans-serif;
+               color: #002e83;
+               text-decoration: none;
+          }
+		#join {
+			font-size: 3vh;
+               text-decoration: none;
+
+		}
+		input {
+			width: 45vh;
+			height: 8vh;
+			font-size: 6vh;
+			text-align: center;
+               border-color: grey;
+               text-decoration: none;
+               box-shadow: 5px 20px 25px rgba(175, 175, 175, 0.699);
+		}
+          .spacer{
+               height: 2.5vh;
+          }
+          button{
+               border-radius: 1vh;
+               height: 5vh;
+               width: 30vh;
+               font-family: 'Noto Sans', sans-serif;
+               background-color: #002e83;
+               color:rgba(255, 255, 255, 0.95) ;
+               box-shadow: 5px 20px 25px rgba(175, 175, 175, 0.699);
+               text-decoration: none;
+
+          }
+          #join:hover{
+               background-color: rgba(0, 41, 116, 0.849)
+          }
+          input{
+               border-radius: 1vh;
+               border: #002e83;
+               background-color: rgb(192, 237, 255);
+               text-decoration: none;
+          }
+          input[type="text"]
+          {
+               font-size:3vh;
+               font-family: 'Noto Sans', sans-serif;
+          }
+          .ctat {
+               background: rgba(255, 255, 255, 0.815);
+               border-radius: 25px;
+               box-shadow: 5px 20px 25px rgba(175, 175, 175, 0.699);
+               padding: 3vh;
+               overflow: auto;
+               text-align: center;
+               margin-top: 5vh;
+               width:fit-content;
+               }
+	</style>
+	
+	<script type="text/javascript">
+		var socket = io.connect(location.origin);
+	</script>
+</head>
+<body>
+     <div class="ctat">
+          <h1>Join A Buzzer Room</h1>
+     </div>
+	
+	<div id="cont">
+          <div id="top" class="spacer"></div>
+          <div >Enter Game Code:</div>
+          <div><input type="text" id="code"></div>
+          <div>Enter A Name:</div>
+          <div><input type="text" id="name"></div>
+          <div><button id="join">Join</button></div>
+          <div class="spacer"></div>
+     </div>
+	<script type="text/javascript">
+		var button = document.getElementById("join");
+		var code = document.getElementById("code").value;
+		var name = document.getElementById("name").value;
+		button.addEventListener("click", function() {
+			code = document.getElementById("code").value;
+			name = document.getElementById("name").value;
+			if(code != "" && name != "") {
+				var out = {
+					code: code,
+					name: name
+				};
+				socket.emit("ask", out);
+			}
+		});
+		socket.on("available", function(data) {
+			if(data == "yes") {
+				window.location = "/../room/?room=" + code + "&name=" + name; 
+			} else if(data == "name") {
+				window.alert("This name is already taken. Please select another.");
+			} else if(data == "room") {
+				window.alert("This Room doesn't exist. Please verify that you used the correct code.");
+			} else {
+				window.alert("There was an error. Please try again.");
+			}
+		});
+	</script>
+</body>
+</html>

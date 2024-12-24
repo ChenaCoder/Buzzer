@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	</script>
+	<meta charset="utf-8">
+	<title>Buzzer</title>
+	<script type="text/javascript">
+		var buzzed = false;
+		var muted = false;
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		var room = urlParams.get('room');
+		var name = urlParams.get('name');
+		if(room == null || name == null) {
+			window.location.replace('/../');
+		}
+		var socket = io.connect(location.origin);
+		var out = {
+			room: room,
+			name: name
+		};
+		socket.emit("join", out);
+	</script>
+	<style type="text/css">
+		#button {
+			background: #00cc00;
+			color: #ffffff;
+			width:60vh;
+			height:60vh;
+			text-align: center;
+			font-size: 15vh;
+			margin:auto;
+			line-height: 60vh;
+			user-select: none;
+			border-radius: 3vh;
+		}
+		#mute-container {
+			font-size: 4vh;
+			margin-top: 1vh;
+		}
+		div {
+			margin: auto;
+			text-align: center;
+			font-size: 5vh;
+		}
+		input {
+			text-align: center;
+			margin: auto;
+		}
+		label {
+			text-align: center;
+			margin: auto;
+		}
+		body {
+			background: #81cef5;
+		}
+	</style>
+</head>
+<body>
+	<div id="button">Buzz</div>
+	<div><u>Currently Buzzed:</u></div>
+	<div id="answering"><i>No One</i></div>
+	<audio id="buzz">
+		<source src="/../assets/buzzer.mp3" type="audio/mpeg">
+	</audio>
+
+	<script type="text/javascript">
+		var button = document.getElementById("button");
+		var answering = document.getElementById("answering");
+		var buzz = document.getElementById("buzz");
+		var mute = document.getElementById("mute");
+		button.addEventListener('click', function() {
+			if(!buzzed) {
+				socket.emit("buzz", room);
+			}
+		});
+		socket.on("buzzed", function(data) {
+			console.log(data);
+			buzzed = true;
+			if(data.name == name) {
+				button.innerHTML = "Buzzed";
+				button.style.background = "#ff0000";
+				answering.innerHTML = data.name;
+			} else {
+				button.innerHTML = "Locked";
+				button.style.background = "#606060";
+				answering.innerHTML = data.name;
+			}
+			if(data.team == "r") {
+				answering.style.color = "red";
+			} else if(data.team == "b") {
+				answering.style.color = "blue";
+			}else if(data.team == "o") {
+				answering.style.color = "orange";
+			}else if(data.team == "y") {
+				answering.style.color = "yellow";
+			}else if(data.team == "g") {
+				answering.style.color = "green";
+			}else if(data.team == "p") {
+				answering.style.color = "purple";
+			}else if(data.team == "w") {
+				answering.style.color = "white";
+			}else if(data.team == "t") {
+				answering.style.color = "teal";
+			}else if(data.team == "l") {
+				answering.style.color = "lime";
+			}else if(data.team == "c") {
+				answering.style.color = "crimson";
+			} else {
+				answering.style.color = "black";
+			}
+			if(!muted) {
+				buzz.play();
+			}
+		});
+		socket.on("reset", function(data) {
+			buzzed = false;
+			button.innerHTML = "Buzz";
+			button.style.background = "#00cc00";
+			answering.innerHTML = "<i>No One</i>";
+			answering.style.color = "black";
+		});
+		document.addEventListener("keydown", function(e) {
+			if(e.keyCode == 32) {
+				if(!buzzed) {
+					socket.emit("buzz", room);
+				}
+			}
+		}, false);
+	</script>
+</body>
+</html>
